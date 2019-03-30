@@ -10,4 +10,19 @@ public class Fire extends Disaster {
 
 	}
 
+	public void strike() {
+		super.strike();
+		if (getTarget() != null) {
+			ResidentialBuilding rb = (ResidentialBuilding) getTarget();
+			rb.setFireDamage(rb.getFireDamage() + 10);
+		}
+	}
+
+	@Override
+	public void cycleStep() {
+		if (getTarget() != null) {
+			ResidentialBuilding rb = (ResidentialBuilding) getTarget();
+			rb.setFireDamage(rb.getFireDamage() + 10);
+		}
+	}
 }

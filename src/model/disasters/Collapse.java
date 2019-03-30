@@ -10,4 +10,21 @@ public class Collapse extends Disaster {
 
 	}
 
+	public void strike() {
+		super.strike();
+		if (getTarget() != null) {
+			ResidentialBuilding rb = (ResidentialBuilding) getTarget();
+			rb.setFoundationDamage(rb.getFoundationDamage() + 10);
+		}
+	}
+
+	@Override
+	public void cycleStep() {
+		if (getTarget() != null) {
+			ResidentialBuilding rb = (ResidentialBuilding) getTarget();
+			rb.setFoundationDamage(rb.getFoundationDamage() + 10);
+		}
+
+	}
+
 }

@@ -1,11 +1,11 @@
 package model.infrastructure;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 
 import model.disasters.Disaster;
 import model.events.SOSListener;
 import model.people.Citizen;
-import model.people.CitizenState;
 import simulation.Address;
 import simulation.Rescuable;
 import simulation.Simulatable;
@@ -20,11 +20,13 @@ public class ResidentialBuilding implements Rescuable, Simulatable {
 	private ArrayList<Citizen> occupants;
 	private Disaster disaster;
 	private SOSListener emergencyService;
+	private SecureRandom sr;
 	public ResidentialBuilding(Address location) {
 
 		this.location = location;
 		this.structuralIntegrity = 100;
 		occupants = new ArrayList<Citizen>();
+		this.sr = new SecureRandom();
 		//??disaster
 	}
 	
@@ -41,17 +43,38 @@ public class ResidentialBuilding implements Rescuable, Simulatable {
 
 	@Override
 	public void cycleStep() {
-		// TODO Auto-generated method stub
+		if (foundationDamage>0) {
+			setStructuralIntegrity(getStructuralIntegrity()-getRandom(5, 10));
+		}
+		
+		if (fireDamage>0 && fireDamage<30) {
+			setStructuralIntegrity(getStructuralIntegrity()-3);
+		}else if(fireDamage>=30&&fireDamage<70) {
+			setStructuralIntegrity(getStructuralIntegrity()-5);
+		}else if(fireDamage>=70&&fireDamage<100){
+			setStructuralIntegrity(getStructuralIntegrity()-7);
+		}
 		
 	}
 	
+	private int getRandom(int start,int end) {
+		return start+sr.nextInt(end);
+	}
 	
 	public int getStructuralIntegrity() {
 		return structuralIntegrity;
 	}
 
 	public void setStructuralIntegrity(int structuralIntegrity) {
-		this.structuralIntegrity = structuralIntegrity;
+		if(structuralIntegrity<=0) {
+			structuralIntegrity = 0;
+			for(Citizen s:occupants) {
+				s.setHp(0);
+			}
+		}else {
+			this.structuralIntegrity = structuralIntegrity;
+		}
+	
 	}
 
 	public int getFireDamage() {

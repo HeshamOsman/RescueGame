@@ -46,6 +46,8 @@ public abstract class Unit implements Simulatable,SOSResponder {
 		
 		this.target = r;
 		
+		//Healing issue
+		
 		
 	}
 	

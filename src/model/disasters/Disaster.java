@@ -17,9 +17,14 @@ public abstract class Disaster implements Simulatable {
 
 	}
 	
-	abstract void strike();
+	public void strike() {
+		if(target!=null) {
+			target.struckBy(this);
+			this.active = true;
+		}
+		
+	}
 
-//	abstract void cycleStep();
 	
 	public boolean isActive() {
 		return active;

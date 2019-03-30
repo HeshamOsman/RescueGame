@@ -77,6 +77,15 @@ public class Simulator implements WorldListener{
 		
 	}
 	
+	
+	
+	
+	@Override
+	public void assignAddress(Simulatable sim, int x, int y) {
+		sim.
+		
+	}
+
 	private void loadUnits(String path) throws Exception {
 
 		BufferedReader br = new BufferedReader(new FileReader(path));

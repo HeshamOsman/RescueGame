@@ -10,4 +10,21 @@ public class GasLeak extends Disaster {
 
 	}
 
+	public void strike() {
+		super.strike();
+
+		if (getTarget() != null) {
+			ResidentialBuilding rb = (ResidentialBuilding) getTarget();
+			rb.setGasLevel(rb.getGasLevel() + 10);
+		}
+	}
+
+	@Override
+	public void cycleStep() {
+		if (getTarget() != null) {
+			ResidentialBuilding rb = (ResidentialBuilding) getTarget();
+			rb.setGasLevel(rb.getGasLevel() + 15);
+		}
+
+	}
 }
