@@ -9,5 +9,8 @@ public class Evacuator extends PoliceUnit {
 		super(unitID, location, stepsPerCycle, maxCapacity);
 
 	}
+	
+	
+	
 
 }

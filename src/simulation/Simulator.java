@@ -9,6 +9,8 @@ import model.disasters.Fire;
 import model.disasters.GasLeak;
 import model.disasters.Infection;
 import model.disasters.Injury;
+import model.events.SOSListener;
+import model.events.WorldListener;
 import model.infrastructure.ResidentialBuilding;
 import model.people.Citizen;
 import model.units.Ambulance;
@@ -18,23 +20,25 @@ import model.units.FireTruck;
 import model.units.GasControlUnit;
 import model.units.Unit;
 
-public class Simulator {
+public class Simulator implements WorldListener{
 
 	private int currentCycle;
 	private ArrayList<ResidentialBuilding> buildings;
-	private ArrayList<Citizen> citizens;
-	private ArrayList<Unit> emergencyUnits;
+	private ArrayList<Citizen> citizens; // all citizens
+	private ArrayList<Unit> emergencyUnits; //all units
 	private ArrayList<Disaster> plannedDisasters;//all aivilable  
 	private ArrayList<Disaster> executedDisasters;
 	private Address[][] world;
+	private SOSListener emergencyService;
 
-	public Simulator() throws Exception {
+	public Simulator(SOSListener emergencyService) throws Exception {
 
 		buildings = new ArrayList<ResidentialBuilding>();
 		citizens = new ArrayList<Citizen>();
 		emergencyUnits = new ArrayList<Unit>();
 		plannedDisasters = new ArrayList<Disaster>();
 		executedDisasters = new ArrayList<Disaster>();
+		this.emergencyService = emergencyService;
 
 		world = new Address[10][10];
 		for (int i = 0; i < 10; i++) {
@@ -61,6 +65,18 @@ public class Simulator {
 		}
 	}
 
+	public boolean checkGameOver() {
+		
+	}
+	
+	public int calculateCasualties() {
+		
+	}
+	
+	public void nextCycle() {
+		
+	}
+	
 	private void loadUnits(String path) throws Exception {
 
 		BufferedReader br = new BufferedReader(new FileReader(path));
@@ -208,4 +224,17 @@ public class Simulator {
 
 		return null;
 	}
+
+
+	public ArrayList<Unit> getEmergencyUnits() {
+		return emergencyUnits;
+	}
+
+
+
+	public void setEmergencyService(SOSListener emergencyService) {
+		this.emergencyService = emergencyService;
+	}
+	
+	
 }

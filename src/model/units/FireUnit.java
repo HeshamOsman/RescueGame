@@ -1,6 +1,7 @@
 package model.units;
 
 import simulation.Address;
+import simulation.Rescuable;
 
 public abstract class FireUnit extends Unit {
 
@@ -10,4 +11,9 @@ public abstract class FireUnit extends Unit {
 
 	}
 
+	@Override
+	public void respond(Rescuable r) {
+		// TODO Auto-generated method stub
+		
+	}
 }

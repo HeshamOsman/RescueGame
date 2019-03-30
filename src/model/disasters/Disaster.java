@@ -16,7 +16,11 @@ public abstract class Disaster implements Simulatable {
 		this.active = false;//by Default
 
 	}
+	
+	abstract void strike();
 
+//	abstract void cycleStep();
+	
 	public boolean isActive() {
 		return active;
 	}

@@ -3,7 +3,9 @@ package model.infrastructure;
 import java.util.ArrayList;
 
 import model.disasters.Disaster;
+import model.events.SOSListener;
 import model.people.Citizen;
+import model.people.CitizenState;
 import simulation.Address;
 import simulation.Rescuable;
 import simulation.Simulatable;
@@ -17,7 +19,7 @@ public class ResidentialBuilding implements Rescuable, Simulatable {
 	private int foundationDamage;
 	private ArrayList<Citizen> occupants;
 	private Disaster disaster;
-
+	private SOSListener emergencyService;
 	public ResidentialBuilding(Address location) {
 
 		this.location = location;
@@ -25,7 +27,25 @@ public class ResidentialBuilding implements Rescuable, Simulatable {
 		occupants = new ArrayList<Citizen>();
 		//??disaster
 	}
+	
+	@Override
+	public void struckBy(Disaster d) {
+		
+		this.disaster = d;
+		if(this.emergencyService != null) {
+			this.emergencyService.receiveSOSCall(this);
+		}
+		
+		
+	}
 
+	@Override
+	public void cycleStep() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 	public int getStructuralIntegrity() {
 		return structuralIntegrity;
 	}
@@ -58,6 +78,7 @@ public class ResidentialBuilding implements Rescuable, Simulatable {
 		this.foundationDamage = foundationDamage;
 	}
 
+	@Override
 	public Address getLocation() {
 		return location;
 	}
@@ -66,8 +87,11 @@ public class ResidentialBuilding implements Rescuable, Simulatable {
 		return occupants;
 	}
 
+	@Override
 	public Disaster getDisaster() {
 		return disaster;
 	}
-
+	public void setEmergencyService(SOSListener emergencyService) {
+		this.emergencyService = emergencyService;
+	}
 }

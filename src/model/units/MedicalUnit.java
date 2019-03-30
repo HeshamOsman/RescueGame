@@ -1,6 +1,7 @@
 package model.units;
 
 import simulation.Address;
+import simulation.Rescuable;
 
 public abstract class MedicalUnit extends Unit {
 
@@ -14,5 +15,22 @@ public abstract class MedicalUnit extends Unit {
 		treatmentAmount = 10;
 
 	}
+
+	public int getTreatmentAmount() {
+		return treatmentAmount;
+	}
+
+	@Override
+	public void respond(Rescuable r) {
+		if(getTarget() != null) {
+			getTarget().getDisaster().setActive(true);
+		}
+		
+		setState(UnitState.RESPONDING);
+		setDistanceToTarget();
+		
+	}
+	
+	
 
 }

@@ -4,6 +4,8 @@ import simulation.Address;
 import simulation.Rescuable;
 import simulation.Simulatable;
 import model.disasters.Disaster;
+import model.events.SOSListener;
+import model.events.WorldListener;
 
 public class Citizen implements Rescuable, Simulatable {
 
@@ -16,6 +18,8 @@ public class Citizen implements Rescuable, Simulatable {
 	private int bloodLoss;
 	private int toxicity;
 	private Address location;
+	private SOSListener emergencyService;
+	private WorldListener worldListener;
 
 	public Citizen(Address location, String nationalID, String name, int age) {
 
@@ -28,6 +32,32 @@ public class Citizen implements Rescuable, Simulatable {
 		//??disaster
 
 	}
+	
+	
+	
+
+	@Override
+	public void cycleStep() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+
+	@Override
+	public void struckBy(Disaster d) {
+		this.state = CitizenState.IN_TROUBLE;
+		this.disaster = d;
+		if(this.emergencyService != null) {
+			this.emergencyService.receiveSOSCall(this);
+		}
+		
+		
+	}
+
+
+
 
 	public CitizenState getState() {
 		return state;
@@ -50,7 +80,15 @@ public class Citizen implements Rescuable, Simulatable {
 	}
 
 	public void setHp(int hp) {
-		this.hp = hp;
+		if(hp>=100) {
+			this.hp = 100;
+		}else if(hp <= 0) {
+			this.hp = 0;
+			setState(CitizenState.DECEASED);
+		}else {
+			this.hp = hp;
+		}
+		
 	}
 
 	public int getBloodLoss() {
@@ -58,7 +96,15 @@ public class Citizen implements Rescuable, Simulatable {
 	}
 
 	public void setBloodLoss(int bloodLoss) {
-		this.bloodLoss = bloodLoss;
+		if(bloodLoss>=100) {
+			this.bloodLoss = 100;
+			setHp(0);
+		}else if(bloodLoss <= 0) {
+			this.bloodLoss = 0;
+			
+		}else {
+			this.bloodLoss = bloodLoss;
+		}
 	}
 
 	public int getToxicity() {
@@ -66,9 +112,17 @@ public class Citizen implements Rescuable, Simulatable {
 	}
 
 	public void setToxicity(int toxicity) {
-		this.toxicity = toxicity;
+		if(toxicity>=100) {
+			this.toxicity = 100;
+			setHp(0);
+		}else if(toxicity <= 0) {
+			this.toxicity = 0;
+			
+		}else {
+			this.toxicity = toxicity;
+		}
 	}
-
+	@Override
 	public Address getLocation() {
 		return location;
 	}
@@ -76,7 +130,7 @@ public class Citizen implements Rescuable, Simulatable {
 	public void setLocation(Address location) {
 		this.location = location;
 	}
-
+	@Override
 	public Disaster getDisaster() {
 		return disaster;
 	}
@@ -84,5 +138,11 @@ public class Citizen implements Rescuable, Simulatable {
 	public String getNationalID() {
 		return nationalID;
 	}
+
+	public void setEmergencyService(SOSListener emergencyService) {
+		this.emergencyService = emergencyService;
+	}
+	
+	
 
 }

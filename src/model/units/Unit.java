@@ -1,10 +1,12 @@
 package model.units;
 
+import model.events.SOSResponder;
+import model.events.WorldListener;
 import simulation.Address;
 import simulation.Rescuable;
 import simulation.Simulatable;
 
-public abstract class Unit implements Simulatable {
+public abstract class Unit implements Simulatable,SOSResponder {
 
 	private String unitID;
 	private UnitState state;
@@ -12,6 +14,7 @@ public abstract class Unit implements Simulatable {
 	private Rescuable target;
 	private int distanceToTarget;
 	private int stepsPerCycle;
+	private WorldListener worldListener;
 
 	public Unit(String unitID, Address location, int stepsPerCycle) {
 
@@ -23,7 +26,33 @@ public abstract class Unit implements Simulatable {
 		//distanceToTarget
 
 	}
+	
+	
 
+	abstract void treat();
+	void jobsDone() {
+		
+	}
+	
+	@Override
+	public void respond(Rescuable r) {
+		
+		setState(UnitState.RESPONDING);
+		setDistanceToTarget(manhattenDistance(this.getLocation(),r.getLocation()));
+		
+		if(getTarget() != null) {
+			getTarget().getDisaster().setActive(true);
+		}
+		
+		this.target = r;
+		
+		
+	}
+	
+	private int manhattenDistance(Address firstAdd , Address secondAdd) {
+		return Math.abs(firstAdd.getX()-secondAdd.getX())+Math.abs(firstAdd.getY()-secondAdd.getY());
+	}
+	
 	public UnitState getState() {
 		return state;
 	}
@@ -52,4 +81,17 @@ public abstract class Unit implements Simulatable {
 		return stepsPerCycle;
 	}
 
+	public void setDistanceToTarget(int distanceToTarget) {
+		this.distanceToTarget = distanceToTarget;
+	}
+
+	public WorldListener getWorldListener() {
+		return worldListener;
+	}
+
+	public void setWorldListener(WorldListener worldListener) {
+		this.worldListener = worldListener;
+	}
+	
+	
 }

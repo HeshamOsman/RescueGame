@@ -3,6 +3,7 @@ package model.units;
 import java.util.ArrayList;
 
 import simulation.Address;
+import simulation.Rescuable;
 import model.people.Citizen;
 //police car
 public abstract class PoliceUnit extends Unit {
@@ -18,6 +19,12 @@ public abstract class PoliceUnit extends Unit {
 		this.maxCapacity = maxCapacity;
 
 	}
+	
+	@Override
+	public void respond(Rescuable r) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	public int getDistanceToBase() {
 		return distanceToBase;
@@ -29,6 +36,10 @@ public abstract class PoliceUnit extends Unit {
 
 	public int getMaxCapacity() {
 		return maxCapacity;
+	}
+	
+	public ArrayList<Citizen> getPassengers() {
+		return passengers;
 	}
 
 }
