@@ -121,45 +121,10 @@ public class Simulator implements WorldListener {
 
 		return true;
 		
-		
-//		if (plannedDisasters.size() == 0) {
-//			return true;
-//		}
-//		
-//		boolean allIdle = true;
-//		
-//		for (Unit e : emergencyUnits) {
-//			if (e.getState() != UnitState.IDLE) {
-//				allIdle = false;
-//			}
-//		}
-//		
-//		if(allIdle) {
-//			return true;
-//		}
-//
-//		boolean allDisastersNotHitting = true;
-//	    for(Disaster e : executedDisasters) { 
-//	    	if(e.isActive()&&e.getTarget() instanceof Citizen&&((Citizen)e.getTarget()).getState() != CitizenState.DECEASED) {
-//	    		allDisastersNotHitting = false;
-//	    	}else if(e.isActive()&&e.getTarget() instanceof ResidentialBuilding&&
-//	    			((ResidentialBuilding)e.getTarget()).getStructuralIntegrity() >0) {
-//	    		allDisastersNotHitting = false;
-//	    	}
-//	    }
-//		 
-//	    if(allDisastersNotHitting) {
-//			return true;
-//		}
-//		
-//
-//		
-//
-//		return false;
 	}
 
 	public int calculateCasualties() {
-		// should implement here...
+		
 
 		int casualties = 0;
 
@@ -225,8 +190,8 @@ public class Simulator implements WorldListener {
 			rb.cycleStep();
 		}
 
-		for (Citizen b : citizens) {
-			b.cycleStep();
+		for (Citizen c : citizens) {
+			c.cycleStep();
 		}
 
 	}

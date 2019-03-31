@@ -20,14 +20,14 @@ public class Evacuator extends PoliceUnit {
 	@Override
 	public void treat() {
 		if (!(getPassengers().size() >= getMaxCapacity())) {
-
+//            setState(UnitState.TREATING);
 			if (getTarget() != null && getTarget() instanceof Citizen) {
 				Citizen c = (Citizen) getTarget();
 				c.getDisaster().setActive(false);
 				c.setState(CitizenState.RESCUED);
 				getPassengers().add(c);
 				if (getPassengers().size() >= getMaxCapacity()) {
-					setDistanceToBase(manhattenDistance(getLocation(), new Address(0, 0)));
+					setDistanceToBase(manhattenDistance(c.getLocation(), new Address(0, 0)));
 				}
 			}
 
@@ -36,7 +36,7 @@ public class Evacuator extends PoliceUnit {
 				ArrayList<Citizen> rescued = new ArrayList<>();
 				for(Citizen c : rb.getOccupants()) {
 					if (getPassengers().size() >= getMaxCapacity()) {
-						setDistanceToBase(manhattenDistance(getLocation(), new Address(0, 0)));
+						setDistanceToBase(manhattenDistance(rb.getLocation(), new Address(0, 0)));
 						break;
 					}
 //					c.getDisaster().setActive(false);
@@ -54,12 +54,15 @@ public class Evacuator extends PoliceUnit {
 
 	@Override
 	public void respond(Rescuable r) {
-		if (!(getPassengers().size() >= getMaxCapacity())) {
-			if (getTarget() != null && getState() == UnitState.RESPONDING) {
-				getTarget().getDisaster().setActive(true);
+		if(r.getDisaster().isActive()) {
+			if (!(getPassengers().size() >= getMaxCapacity())) {
+				if (getTarget() != null && getState() == UnitState.RESPONDING) {
+					getTarget().getDisaster().setActive(true);
+				}
+				super.respond(r);
 			}
-			super.respond(r);
 		}
+		
 
 	}
 
@@ -69,6 +72,7 @@ public class Evacuator extends PoliceUnit {
 			super.cycleStep();
 		} else {
 			setDistanceToBase(getDistanceToBase() - getStepsPerCycle());
+			
 			if (getDistanceToBase() <= 0) {
 				setDistanceToBase(0);
 				setLocation(new Address(0, 0));
@@ -82,7 +86,7 @@ public class Evacuator extends PoliceUnit {
 				if(getTarget() != null && getTarget() instanceof ResidentialBuilding &&
 						((ResidentialBuilding) getTarget()).getOccupants().size()>0 ) {
 					setDistanceToTarget(manhattenDistance(this.getLocation(),getTarget().getLocation()));
-//					super.cycleStep();
+					setState(UnitState.RESPONDING);
 				}else {
 					setState(UnitState.IDLE);
 				}
