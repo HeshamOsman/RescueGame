@@ -18,7 +18,7 @@ public class CommandCenter implements SOSListener {
 
 	public CommandCenter() throws Exception {
 
-		engine = new Simulator();
+		engine = new Simulator(this);
 		visibleBuildings = new ArrayList<ResidentialBuilding>();
 		visibleCitizens = new ArrayList<Citizen>();
 		emergencyUnits = new ArrayList<Unit>();
@@ -28,9 +28,9 @@ public class CommandCenter implements SOSListener {
 	@Override
 	public void receiveSOSCall(Rescuable r) {
 		if(r instanceof ResidentialBuilding) {
-			visibleBuildings.add(r);
+			visibleBuildings.add((ResidentialBuilding)r);
 		}else {
-			
+			visibleCitizens.add((Citizen)r);
 		}
 		
 	}

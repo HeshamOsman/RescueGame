@@ -3,7 +3,9 @@ package simulation;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.List;
 
+import model.disasters.Collapse;
 import model.disasters.Disaster;
 import model.disasters.Fire;
 import model.disasters.GasLeak;
@@ -13,22 +15,25 @@ import model.events.SOSListener;
 import model.events.WorldListener;
 import model.infrastructure.ResidentialBuilding;
 import model.people.Citizen;
+import model.people.CitizenState;
 import model.units.Ambulance;
 import model.units.DiseaseControlUnit;
 import model.units.Evacuator;
 import model.units.FireTruck;
 import model.units.GasControlUnit;
 import model.units.Unit;
+import model.units.UnitState;
 
-public class Simulator implements WorldListener{
+public class Simulator implements WorldListener {
 
 	private int currentCycle;
 	private ArrayList<ResidentialBuilding> buildings;
 	private ArrayList<Citizen> citizens; // all citizens
-	private ArrayList<Unit> emergencyUnits; //all units
-	private ArrayList<Disaster> plannedDisasters;//all aivilable  
+	private ArrayList<Unit> emergencyUnits; // all units
+	private ArrayList<Disaster> plannedDisasters;// all aivilable
 	private ArrayList<Disaster> executedDisasters;
 	private Address[][] world;
+	private WorldListener worldListener;
 	private SOSListener emergencyService;
 
 	public Simulator(SOSListener emergencyService) throws Exception {
@@ -39,7 +44,14 @@ public class Simulator implements WorldListener{
 		plannedDisasters = new ArrayList<Disaster>();
 		executedDisasters = new ArrayList<Disaster>();
 		this.emergencyService = emergencyService;
+		this.worldListener = new WorldListener() {
 
+			@Override
+			public void assignAddress(Simulatable sim, int x, int y) {
+				// TODO Auto-generated method stub
+
+			}
+		};
 		world = new Address[10][10];
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
@@ -63,27 +75,160 @@ public class Simulator implements WorldListener{
 
 			}
 		}
+
+	}
+
+	public void assignAddress(Simulatable sim, int x, int y) {
+		if (sim instanceof Unit) {
+			Unit d = (Unit) sim;
+			d.setLocation(world[x][y]);
+		}
+
+		if (sim instanceof Citizen) {
+			Citizen d = (Citizen) sim;
+			d.setLocation(world[x][y]);
+		}
+
 	}
 
 	public boolean checkGameOver() {
+
+		if (plannedDisasters.size() > 0) {
+			return false;
+		}
 		
+		for (Unit e : emergencyUnits) {
+			if (e.getState() != UnitState.IDLE) {
+				return false;
+			}
+		}
+		
+
+
+	    for(Disaster e : executedDisasters) { 
+	    	if(e.isActive()&&e.getTarget() instanceof Citizen&&((Citizen)e.getTarget()).getState() != CitizenState.DECEASED) {
+	    		return false;
+	    	}else if(e.isActive()&&e.getTarget() instanceof ResidentialBuilding&&
+	    			((ResidentialBuilding)e.getTarget()).getStructuralIntegrity() >0) {
+	    		return false;
+	    	}
+	    }
+		 
+	   
+		
+
+		
+
+		return true;
+		
+		
+//		if (plannedDisasters.size() == 0) {
+//			return true;
+//		}
+//		
+//		boolean allIdle = true;
+//		
+//		for (Unit e : emergencyUnits) {
+//			if (e.getState() != UnitState.IDLE) {
+//				allIdle = false;
+//			}
+//		}
+//		
+//		if(allIdle) {
+//			return true;
+//		}
+//
+//		boolean allDisastersNotHitting = true;
+//	    for(Disaster e : executedDisasters) { 
+//	    	if(e.isActive()&&e.getTarget() instanceof Citizen&&((Citizen)e.getTarget()).getState() != CitizenState.DECEASED) {
+//	    		allDisastersNotHitting = false;
+//	    	}else if(e.isActive()&&e.getTarget() instanceof ResidentialBuilding&&
+//	    			((ResidentialBuilding)e.getTarget()).getStructuralIntegrity() >0) {
+//	    		allDisastersNotHitting = false;
+//	    	}
+//	    }
+//		 
+//	    if(allDisastersNotHitting) {
+//			return true;
+//		}
+//		
+//
+//		
+//
+//		return false;
 	}
-	
+
 	public int calculateCasualties() {
-		
+		// should implement here...
+
+		int casualties = 0;
+
+		for (Citizen e : citizens) {
+			if (e.getState() == CitizenState.DECEASED) {
+				casualties++;
+			}
+		}
+
+		return casualties;
 	}
-	
+
 	public void nextCycle() {
-		
-	}
-	
-	
-	
-	
-	@Override
-	public void assignAddress(Simulatable sim, int x, int y) {
-		sim.
-		
+
+		currentCycle++;
+
+		ArrayList<Disaster> toBeExcutedDisaster = new ArrayList<>();
+		for (Disaster pd : plannedDisasters) {
+			if (pd.getStartCycle() == currentCycle) {
+				toBeExcutedDisaster.add(pd);
+			}
+		}
+		plannedDisasters.removeAll(toBeExcutedDisaster);
+
+		for (ResidentialBuilding rb : buildings) {
+			if (rb.getFireDamage() >= 100) {
+				rb.struckBy(new Collapse(currentCycle, rb));
+			}
+		}
+
+		for (Disaster d : toBeExcutedDisaster) {
+			
+			if(d.getTarget() instanceof ResidentialBuilding) {
+				ResidentialBuilding rb= (ResidentialBuilding)d.getTarget();
+				if(rb.getDisaster() != null && rb.getDisaster() instanceof GasLeak&& d instanceof Fire && rb.getGasLevel() > 0) {
+					if(rb.getGasLevel()<70) {
+						d = new Collapse(d.getStartCycle(), rb);
+					}else {
+						rb.setStructuralIntegrity(0);
+					}
+				}else if(rb.getDisaster() != null && rb.getDisaster() instanceof Fire && d instanceof GasLeak){
+					d = new Collapse(d.getStartCycle(), rb);
+				}
+			}
+			
+			
+			d.strike();
+			executedDisasters.add(d);
+		}
+		for (Unit b : emergencyUnits) {
+			b.cycleStep();
+		}
+
+		for (Disaster b : executedDisasters) {
+
+			if (!toBeExcutedDisaster.contains(b) && b.isActive()) {
+				b.cycleStep();
+			}
+
+		}
+
+		for (ResidentialBuilding rb : buildings) {
+			rb.cycleStep();
+		}
+
+		for (Citizen b : citizens) {
+			b.cycleStep();
+		}
+
 	}
 
 	private void loadUnits(String path) throws Exception {
@@ -100,23 +245,23 @@ public class Simulator implements WorldListener{
 			switch (info[0]) {
 
 			case "AMB":
-				emergencyUnits.add(new Ambulance(id, world[0][0], steps));
+				emergencyUnits.add(new Ambulance(id, world[0][0], steps, worldListener));
 				break;
 
 			case "DCU":
-				emergencyUnits.add(new DiseaseControlUnit(id, world[0][0], steps));
+				emergencyUnits.add(new DiseaseControlUnit(id, world[0][0], steps, worldListener));
 				break;
 
 			case "EVC":
-				emergencyUnits.add(new Evacuator(id, world[0][0], steps, Integer.parseInt(info[3])));
+				emergencyUnits.add(new Evacuator(id, world[0][0], steps, worldListener, Integer.parseInt(info[3])));
 				break;
 
 			case "FTK":
-				emergencyUnits.add(new FireTruck(id, world[0][0], steps));
+				emergencyUnits.add(new FireTruck(id, world[0][0], steps, worldListener));
 				break;
 
 			case "GCU":
-				emergencyUnits.add(new GasControlUnit(id, world[0][0], steps));
+				emergencyUnits.add(new GasControlUnit(id, world[0][0], steps, worldListener));
 				break;
 
 			}
@@ -160,7 +305,7 @@ public class Simulator implements WorldListener{
 			String name = info[3];
 			int age = Integer.parseInt(info[4]);
 
-			citizens.add(new Citizen(world[x][y], id, name, age));
+			citizens.add(new Citizen(world[x][y], id, name, age, worldListener));
 
 			line = br.readLine();
 
@@ -234,16 +379,12 @@ public class Simulator implements WorldListener{
 		return null;
 	}
 
-
 	public ArrayList<Unit> getEmergencyUnits() {
 		return emergencyUnits;
 	}
 
-
-
 	public void setEmergencyService(SOSListener emergencyService) {
 		this.emergencyService = emergencyService;
 	}
-	
-	
+
 }

@@ -16,12 +16,13 @@ public abstract class Unit implements Simulatable,SOSResponder {
 	private int stepsPerCycle;
 	private WorldListener worldListener;
 
-	public Unit(String unitID, Address location, int stepsPerCycle) {
+	public Unit(String unitID, Address location, int stepsPerCycle, WorldListener worldListener) {
 
 		this.unitID = unitID;
 		this.location = location;
 		this.stepsPerCycle = stepsPerCycle;
 		this.state = UnitState.IDLE;
+		this.worldListener = worldListener;
 		//target
 		//distanceToTarget
 
@@ -29,9 +30,32 @@ public abstract class Unit implements Simulatable,SOSResponder {
 	
 	
 
-	abstract void treat();
-	void jobsDone() {
+	@Override
+	public void cycleStep() {
+		if(this.state != UnitState.IDLE&& this.target!=null) {
+			if(this.state == UnitState.RESPONDING) {
+				distanceToTarget -= stepsPerCycle;
+				if(distanceToTarget <= 0) {
+					distanceToTarget=0;
+					location = target.getLocation();
+					this.state = UnitState.TREATING;
+					treat();
+				}
+			}else if(this.state == UnitState.TREATING) {
+				treat();
+			}
+		}
 		
+	}
+
+
+
+	public abstract void treat();
+	public void jobsDone() {
+		if(getLocation().equals(getTarget().getLocation())) {
+			setState(UnitState.IDLE);
+		}
+		target = null;
 	}
 	
 	@Override
@@ -39,19 +63,17 @@ public abstract class Unit implements Simulatable,SOSResponder {
 		
 		setState(UnitState.RESPONDING);
 		setDistanceToTarget(manhattenDistance(this.getLocation(),r.getLocation()));
-		
-		if(getTarget() != null) {
-			getTarget().getDisaster().setActive(true);
-		}
-		
 		this.target = r;
+		
+		
+		
 		
 		//Healing issue
 		
 		
 	}
 	
-	private int manhattenDistance(Address firstAdd , Address secondAdd) {
+	protected int manhattenDistance(Address firstAdd , Address secondAdd) {
 		return Math.abs(firstAdd.getX()-secondAdd.getX())+Math.abs(firstAdd.getY()-secondAdd.getY());
 	}
 	

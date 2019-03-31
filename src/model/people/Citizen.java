@@ -36,7 +36,7 @@ public class Citizen implements Simulatable, Rescuable {
 
 	@Override
 	public void cycleStep() {
-		if ((toxicity >= 0 && toxicity < 30) ||(bloodLoss >= 0 && bloodLoss < 30)) {
+		if ((toxicity > 0 && toxicity < 30) ||(bloodLoss > 0 && bloodLoss < 30)) {
 			setHp(getHp()-5);
 		}else if((toxicity >= 30 && toxicity < 70)||(bloodLoss >= 30 && bloodLoss < 70)) {
 			setHp(getHp()-10);

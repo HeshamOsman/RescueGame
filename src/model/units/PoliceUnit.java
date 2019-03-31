@@ -4,7 +4,9 @@ import java.util.ArrayList;
 
 import simulation.Address;
 import simulation.Rescuable;
+import model.events.WorldListener;
 import model.people.Citizen;
+import model.people.CitizenState;
 //police car
 public abstract class PoliceUnit extends Unit {
 
@@ -12,17 +14,24 @@ public abstract class PoliceUnit extends Unit {
 	private int maxCapacity;
 	private int distanceToBase;//police base
 
-	public PoliceUnit(String unitID, Address location, int stepsPerCycle, int maxCapacity) {
+	public PoliceUnit(String unitID, Address location, int stepsPerCycle, WorldListener worldListener, int maxCapacity) {
 
-		super(unitID, location, stepsPerCycle);
+		super(unitID, location, stepsPerCycle, worldListener);
 		passengers = new ArrayList<Citizen>();
 		this.maxCapacity = maxCapacity;
 
 	}
 	
+	
+	
 	@Override
-	public void respond(Rescuable r) {
-		// TODO Auto-generated method stub
+	public void jobsDone() {
+		super.jobsDone();
+		Citizen c = (Citizen)getTarget();
+		
+		if(c != null&& c.getState()==CitizenState.DECEASED) {
+			setState(UnitState.IDLE);
+		}
 		
 	}
 

@@ -3,9 +3,13 @@ package model.infrastructure;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 
+import model.disasters.Collapse;
 import model.disasters.Disaster;
+import model.disasters.Fire;
+import model.disasters.GasLeak;
 import model.events.SOSListener;
 import model.people.Citizen;
+import model.people.CitizenState;
 import simulation.Address;
 import simulation.Rescuable;
 import simulation.Simulatable;
@@ -27,6 +31,14 @@ public class ResidentialBuilding implements Rescuable, Simulatable {
 		this.structuralIntegrity = 100;
 		occupants = new ArrayList<Citizen>();
 		this.sr = new SecureRandom();
+		emergencyService = new SOSListener() {
+			
+			@Override
+			public void receiveSOSCall(Rescuable r) {
+				// TODO Auto-generated method stub
+				
+			}
+		};
 		//??disaster
 	}
 	
@@ -34,6 +46,15 @@ public class ResidentialBuilding implements Rescuable, Simulatable {
 	public void struckBy(Disaster d) {
 		
 		this.disaster = d;
+		
+		for(Citizen s:occupants) {
+			s.setState(CitizenState.IN_TROUBLE);
+		}
+		
+		if(this.disaster instanceof Collapse) {
+			setFireDamage(0);
+		}
+		
 		if(this.emergencyService != null) {
 			this.emergencyService.receiveSOSCall(this);
 		}
@@ -67,7 +88,7 @@ public class ResidentialBuilding implements Rescuable, Simulatable {
 
 	public void setStructuralIntegrity(int structuralIntegrity) {
 		if(structuralIntegrity<=0) {
-			structuralIntegrity = 0;
+			this.structuralIntegrity = 0;
 			for(Citizen s:occupants) {
 				s.setHp(0);
 			}
@@ -82,7 +103,14 @@ public class ResidentialBuilding implements Rescuable, Simulatable {
 	}
 
 	public void setFireDamage(int fireDamage) {
-		this.fireDamage = fireDamage;
+		if(fireDamage >= 100) {
+			this.fireDamage = 100;
+		}else if(fireDamage<=0) {
+			this.fireDamage = 0;
+		}else {
+			this.fireDamage = fireDamage;
+		}
+		
 	}
 
 	public int getGasLevel() {
@@ -90,7 +118,17 @@ public class ResidentialBuilding implements Rescuable, Simulatable {
 	}
 
 	public void setGasLevel(int gasLevel) {
-		this.gasLevel = gasLevel;
+		if(gasLevel >= 100) {
+			this.gasLevel = 100;
+			for(Citizen s:occupants) {
+				s.setHp(0);
+			}
+		}else if(gasLevel<=0) {
+			this.gasLevel = 0;
+		}else {
+			this.gasLevel = gasLevel;
+		}
+		
 	}
 
 	public int getFoundationDamage() {
@@ -98,6 +136,9 @@ public class ResidentialBuilding implements Rescuable, Simulatable {
 	}
 
 	public void setFoundationDamage(int foundationDamage) {
+		if(foundationDamage>=100) {
+			setStructuralIntegrity(0);
+		}
 		this.foundationDamage = foundationDamage;
 	}
 
