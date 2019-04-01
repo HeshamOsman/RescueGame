@@ -24,16 +24,7 @@ public abstract class PoliceUnit extends Unit {
 	
 	
 	
-	@Override
-	public void jobsDone() {
-		super.jobsDone();
-		Citizen c = (Citizen)getTarget();
-		
-		if(c != null&& c.getState()==CitizenState.DECEASED) {
-			setState(UnitState.IDLE);
-		}
-		
-	}
+
 
 	public int getDistanceToBase() {
 		return distanceToBase;

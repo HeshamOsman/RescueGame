@@ -2,6 +2,8 @@ package model.units;
 
 import model.events.SOSResponder;
 import model.events.WorldListener;
+import model.infrastructure.ResidentialBuilding;
+import model.people.Citizen;
 import simulation.Address;
 import simulation.Rescuable;
 import simulation.Simulatable;
@@ -63,9 +65,8 @@ public abstract class Unit implements Simulatable,SOSResponder {
 		
 	}
 
-
-
 	public abstract void treat();
+	
 	public void jobsDone() {
 		if(getLocation().equals(getTarget().getLocation())) {
 			setState(UnitState.IDLE);
@@ -75,7 +76,9 @@ public abstract class Unit implements Simulatable,SOSResponder {
 	
 	@Override
 	public void respond(Rescuable r) {
-		if(this.target!=null) {
+//		if(this.target!=null && this.target instanceof ResidentialBuilding ) {
+		if(this.target!=null ) {
+			
 			this.target.getDisaster().setActive(true);
 		}
 		
@@ -83,10 +86,6 @@ public abstract class Unit implements Simulatable,SOSResponder {
 		setDistanceToTarget(manhattenDistance(this.getLocation(),r.getLocation()));
 		this.target = r;
 		
-		
-		
-		
-		//Healing issue
 		
 		
 	}

@@ -31,6 +31,14 @@ public class Citizen implements Simulatable, Rescuable {
 		this.hp = 100;
 		this.worldListener = worldListener;
 		// ??disaster
+		emergencyService = new SOSListener() {
+
+			@Override
+			public void receiveSOSCall(Rescuable r) {
+				// TODO Auto-generated method stub
+
+			}
+		};
 
 	}
 

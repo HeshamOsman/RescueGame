@@ -27,11 +27,9 @@ public abstract class MedicalUnit extends Unit {
 	public void respond(Rescuable r) {
 		if (getTarget() != null) {
 			Citizen c = (Citizen) getTarget();
-
+//			if (getState() == UnitState.TREATING) {
 			if (c.getToxicity() == 0 || c.getBloodLoss() == 0) {
 				c.getDisaster().setActive(false);
-			}else {
-				c.getDisaster().setActive(true);
 			}
 		}
 		
@@ -47,13 +45,13 @@ public abstract class MedicalUnit extends Unit {
 	@Override
 	public void jobsDone() {
 		
-		super.jobsDone();
-		
 		Citizen c = (Citizen)getTarget();
 		
 		if(c != null&& c.getState()==CitizenState.DECEASED) {
 			setState(UnitState.IDLE);
 		}
+		
+		super.jobsDone();
 		
 	}
 	

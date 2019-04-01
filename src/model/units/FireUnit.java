@@ -16,12 +16,14 @@ public abstract class FireUnit extends Unit {
 	
 	@Override
 	public void jobsDone() {
-		super.jobsDone();
+		
 		ResidentialBuilding rb = (ResidentialBuilding)getTarget();
 		
 		if(rb != null&& rb.getStructuralIntegrity()==0) {
 			setState(UnitState.IDLE);
 		}
+		
+		super.jobsDone();
 		
 	}
 }
