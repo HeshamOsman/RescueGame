@@ -19,20 +19,24 @@ public class Evacuator extends PoliceUnit {
 
 	@Override
 	public void treat() {
-		if (!(getPassengers().size() >= getMaxCapacity())) {
-//            setState(UnitState.TREATING);
-			if (getTarget() != null && getTarget() instanceof Citizen) {
-				Citizen c = (Citizen) getTarget();
-				c.getDisaster().setActive(false);
-				c.setState(CitizenState.RESCUED);
-				getPassengers().add(c);
-				if (getPassengers().size() >= getMaxCapacity()) {
-					setDistanceToBase(manhattenDistance(c.getLocation(), new Address(0, 0)));
-				}
-			}
+
+//			if (getTarget() != null && getTarget() instanceof Citizen) {
+//				Citizen c = (Citizen) getTarget();
+//				c.getDisaster().setActive(false);
+////				c.setState(CitizenState.RESCUED);
+//				getPassengers().add(c);
+//				if (getPassengers().size() >= getMaxCapacity()) {
+//					setDistanceToBase(manhattenDistance(c.getLocation(), new Address(0, 0)));
+//				}
+//			}
 
 			if (getTarget() != null && getTarget() instanceof ResidentialBuilding) {
 				ResidentialBuilding rb = (ResidentialBuilding) getTarget();
+				
+				if(rb.getOccupants().isEmpty()) {
+					jobsDone();
+				}
+				
 				ArrayList<Citizen> rescued = new ArrayList<>();
 				for(Citizen c : rb.getOccupants()) {
 					if (getPassengers().size() >= getMaxCapacity()) {
@@ -48,23 +52,22 @@ public class Evacuator extends PoliceUnit {
 				rb.getOccupants().removeAll(rescued);
 			}
 
-		}
 
 	}
 
-	@Override
-	public void respond(Rescuable r) {
-		if(r.getDisaster().isActive()) {
-			if (!(getPassengers().size() >= getMaxCapacity())) {
-				if (getTarget() != null && getState() == UnitState.RESPONDING) {
-					getTarget().getDisaster().setActive(true);
-				}
-				super.respond(r);
-			}
-		}
-		
-
-	}
+//	@Override
+//	public void respond(Rescuable r) {
+//		if(r.getDisaster().isActive()) {
+//			if (getState() == UnitState.IDLE) {
+//				if (getTarget() != null && getState() == UnitState.RESPONDING) {
+//					getTarget().getDisaster().setActive(true);
+//				}
+//				super.respond(r);
+//			}
+//		}
+//		
+//
+//	}
 
 	@Override
 	public void cycleStep() {
@@ -72,10 +75,10 @@ public class Evacuator extends PoliceUnit {
 			super.cycleStep();
 		} else {
 			setDistanceToBase(getDistanceToBase() - getStepsPerCycle());
-			
+//			setDistanceToTarget(getDistanceToBase());
 			if (getDistanceToBase() <= 0) {
 				setDistanceToBase(0);
-				setLocation(new Address(0, 0));
+				this.setLocation(new Address(0, 0));
 				
 				for(Citizen c :getPassengers()) {
 					c.setState(CitizenState.RESCUED);
@@ -83,12 +86,10 @@ public class Evacuator extends PoliceUnit {
 				}
 				
 				getPassengers().removeAll(getPassengers());
-				if(getTarget() != null && getTarget() instanceof ResidentialBuilding &&
-						((ResidentialBuilding) getTarget()).getOccupants().size()>0 ) {
+				
+				if(getTarget() != null && getTarget() instanceof ResidentialBuilding) {
 					setDistanceToTarget(manhattenDistance(this.getLocation(),getTarget().getLocation()));
-					setState(UnitState.RESPONDING);
-				}else {
-					setState(UnitState.IDLE);
+//					setState(UnitState.TREATING);
 				}
 			}
 		}

@@ -21,10 +21,16 @@ public class Ambulance extends MedicalUnit {
 		c.getDisaster().setActive(false);
 		c.setBloodLoss(c.getBloodLoss()-getTreatmentAmount()); 
 		if(c.getBloodLoss()==0) {
+//			c.getDisaster().setActive(false);
 			c.setState(CitizenState.RESCUED);
 			heal();
 		}
 	}
+
+	
+	
+	
+	
 
 	
 	

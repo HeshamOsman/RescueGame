@@ -13,14 +13,6 @@ public abstract class FireUnit extends Unit {
 		super(unitID, location, stepsPerCycle, worldListener);
 
 	}
-
-	@Override
-	public void respond(Rescuable r) {
-		if(getTarget() != null) {
-			getTarget().getDisaster().setActive(true);
-		}
-		super.respond(r);
-	}
 	
 	@Override
 	public void jobsDone() {

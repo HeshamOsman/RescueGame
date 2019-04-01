@@ -33,16 +33,31 @@ public abstract class Unit implements Simulatable,SOSResponder {
 	@Override
 	public void cycleStep() {
 		if(this.state != UnitState.IDLE&& this.target!=null) {
-			if(this.state == UnitState.RESPONDING) {
+			if(this.state == UnitState.RESPONDING&& this.getLocation().equals(target.getLocation())) {
+				
+				this.state = UnitState.TREATING;
+				treat();
+			}else if(this.state == UnitState.RESPONDING) {
+				distanceToTarget -= stepsPerCycle;
+				if(distanceToTarget <= 0) {
+					distanceToTarget=0;
+					location = target.getLocation();
+					
+//					treat();
+				}
+			}else if(this.state == UnitState.TREATING) {
+				if(this.getLocation().equals(target.getLocation())) {
+					treat();
+				}
+				
 				distanceToTarget -= stepsPerCycle;
 				if(distanceToTarget <= 0) {
 					distanceToTarget=0;
 					location = target.getLocation();
 					this.state = UnitState.TREATING;
-					treat();
+//					treat();
 				}
-			}else if(this.state == UnitState.TREATING) {
-				treat();
+				
 			}
 		}
 		
@@ -60,6 +75,9 @@ public abstract class Unit implements Simulatable,SOSResponder {
 	
 	@Override
 	public void respond(Rescuable r) {
+		if(this.target!=null) {
+			this.target.getDisaster().setActive(true);
+		}
 		
 		setState(UnitState.RESPONDING);
 		setDistanceToTarget(manhattenDistance(this.getLocation(),r.getLocation()));

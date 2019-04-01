@@ -30,9 +30,8 @@ public abstract class MedicalUnit extends Unit {
 
 			if (c.getToxicity() == 0 || c.getBloodLoss() == 0) {
 				c.getDisaster().setActive(false);
-			} else {
-
-				getTarget().getDisaster().setActive(true);
+			}else {
+				c.getDisaster().setActive(true);
 			}
 		}
 		

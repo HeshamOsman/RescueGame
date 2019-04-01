@@ -124,17 +124,15 @@ public class Simulator implements WorldListener {
 	}
 
 	public int calculateCasualties() {
-		
+		int casualtiesCount = 0;
 
-		int casualties = 0;
-
-		for (Citizen e : citizens) {
-			if (e.getState() == CitizenState.DECEASED) {
-				casualties++;
+		for (Citizen c : citizens) {
+			if (c.getState() == CitizenState.DECEASED) {
+				casualtiesCount++;
 			}
 		}
 
-		return casualties;
+		return casualtiesCount;
 	}
 
 	public void nextCycle() {
